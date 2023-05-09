@@ -1,0 +1,66 @@
+---
+version: '3'
+
+#####################################
+#
+# service configuration
+#
+#####################################
+services:
+    service:
+        image: tecnativa/docker-socket-proxy:0.1.1
+        container_name: ${SERVICE}
+        restart: unless-stopped
+        security_opt:
+            - no-new-privileges:true
+        networks:
+            - service_network_1
+        expose:
+            - ${SERVICE_PORT}
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        environment:
+            LOG_LEVEL: info # debug,info,notice,warning,err,crit,alert,emerg
+            ## Granted by default
+            EVENTS: 1
+            PING: 1
+            VERSION: 1
+            ## Revoked by Default
+            # Security critical
+            AUTH: 0
+            SECRETS: 0
+            POST: 1 # WUD
+            # Not always needed
+            BUILD: 0
+            COMMIT: 0
+            CONFIGS: 0
+            CONTAINERS: 1 # Portainer, Traefik, etc.
+            DISTRIBUTION: 0
+            EXEC: 0
+            IMAGES: 1 # WUD
+            INFO: 0 # Portainer
+            NETWORKS: 0 # Portainer
+            NODES: 0
+            PLUGINS: 0
+            SERVICES: 0 # Portainer
+            SESSION: 0
+            SWARM: 0
+            SYSTEM: 0
+            TASKS: 0 # Portainer
+            VOLUMES: 0 # Portainer
+        labels:
+            # wud
+            - wud.watch=true
+            - wud.display.name=${SERVICE}
+            - wud.tag.include=^\d+\.\d+\.\d+$$
+            - wud.link.template=https://github.com/Tecnativa/docker-socket-proxy/releases/tag/v$${major}.$${minor}.$${patch}    
+
+#####################################
+#
+# network configuration
+#
+#####################################
+networks:
+    service_network_1:
+        external: true    
+        name: ${SERVICE_NETWORK_1}
